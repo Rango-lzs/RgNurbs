@@ -1,0 +1,2 @@
+step1：Implement the general Spline algorithm，include Beizier, Bspline, Nurbs curve and surface
+step2: Encapsulate it as a geometry library
