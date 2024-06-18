@@ -1,4 +1,5 @@
 #include "beizier_curve.h"
+#include <assert.h>
 
 
 namespace
@@ -32,34 +33,18 @@ namespace
 	}
 }
 
-Point operator *(const Point& pt, double d)
-{
-	return Point{ pt.x() * d, pt.y() * d, pt.z() * d};
-}
-
-Point operator *(double d, const Point& pt)
-{
-	return  pt * d;
-}
-
-Point operator /(const Point& pt, double d)
-{
-	return pt * (1 / d);
-}
-
-
-BeizierCurve::BeizierCurve(int degree, std::vector<Point> ctrlPts)
+BeizierCurve::BeizierCurve(int degree, std::vector<Point3d> ctrlPts)
 	:m_degree(degree)
 	,m_ctrlPts(ctrlPts)
 {
-	//std::assert(degree == ctrlPts.size() - 1);
+	assert(degree == ctrlPts.size() - 1);
 }
 
 //
-Point BeizierCurve::EvalPoint(double param)
+Point3d BeizierCurve::EvalPoint(double param)
 {
 	std::vector<double> B = calBernstein(m_degree, param);
-	Point temp(0,0,0);
+	Point3d temp(0,0,0);
 	for (int k = 0; k <= m_degree; k++)
 	{
 		temp = temp + B[k] * m_ctrlPts[k];
@@ -67,9 +52,9 @@ Point BeizierCurve::EvalPoint(double param)
 	return temp;
 }
 
-Point BeizierCurve::EvalPointDirect(double t)
+Point3d BeizierCurve::EvalPointDirect(double t)
 {
-	Point temp(0, 0, 0);
+	Point3d temp(0, 0, 0);
 	int n = m_degree;
 	for (int k = 0; k <= m_degree; k++)
 	{
