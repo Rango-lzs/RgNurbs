@@ -2,9 +2,9 @@
 //
 
 #include <iostream>
-
 #include "beizier_curve.h"
 
+using Point = Point3d;
 
 int test_BezierGPT() {
     // Define control points for a cubic Bezier curve
@@ -15,7 +15,7 @@ int test_BezierGPT() {
         {4.0, 0.0, 0}
     };
 
-    BezierCurve_GPT bezier(controlPoints);
+    BezierCurve_GPT<Point> bezier(controlPoints);
 
     double t = 0.5;
     Point point = bezier.calculate(t);
@@ -39,7 +39,7 @@ int main()
         Point(20,0,0)
     };
 
-    BeizierCurve curve(3, ctrlPts);
+    BeizierCurve<Point> curve(3, ctrlPts);
 
     Point eval = curve.EvalPoint(0.3);
     Point eval1 = curve.EvalPointDirect(0.3);
@@ -58,7 +58,7 @@ int main()
     std::vector<Point> elevate;
     curve.DegreeElevation(elevate);
 
-    BeizierCurve curve_h(4, elevate);
+    BeizierCurve<Point> curve_h(4, elevate);
     Point evalh = curve_h.EvalPoint(0.3);
     Point eval1h = curve_h.EvalPointDirect(0.3);
     Point  eval2h = curve_h.EvalPointByDeCasteljau(0.3);
@@ -73,7 +73,7 @@ int main()
         {3.0, 3.0, 0},
         {4.0, 0.0, 0}
     };
-    BeizierCurve curve_deri(3, controlPoints);
+    BeizierCurve<Point> curve_deri(3, controlPoints);
 
     double t = 0.5;
 

@@ -1,4 +1,5 @@
 #include "beizier_curve.h"
+#include "nurbs_export.h"
 #include <assert.h>
 
 
@@ -33,7 +34,8 @@ namespace
 	}
 }
 
-BeizierCurve::BeizierCurve(int degree, std::vector<Point3d> ctrlPts)
+template<class T>
+BeizierCurve<T>::BeizierCurve(int degree, std::vector<T> ctrlPts)
 	:m_degree(degree)
 	,m_ctrlPts(ctrlPts)
 {
@@ -41,10 +43,11 @@ BeizierCurve::BeizierCurve(int degree, std::vector<Point3d> ctrlPts)
 }
 
 //
-Point3d BeizierCurve::EvalPoint(double param)
+template<class T>
+T BeizierCurve<T>::EvalPoint(double param)
 {
 	std::vector<double> B = calBernstein(m_degree, param);
-	Point3d temp(0,0,0);
+	T temp;
 	for (int k = 0; k <= m_degree; k++)
 	{
 		temp = temp + B[k] * m_ctrlPts[k];
@@ -52,9 +55,10 @@ Point3d BeizierCurve::EvalPoint(double param)
 	return temp;
 }
 
-Point3d BeizierCurve::EvalPointDirect(double t)
+template<class T>
+T BeizierCurve<T>::EvalPointDirect(double t)
 {
-	Point3d temp(0, 0, 0);
+	T temp;
 	int n = m_degree;
 	for (int k = 0; k <= m_degree; k++)
 	{
@@ -62,3 +66,6 @@ Point3d BeizierCurve::EvalPointDirect(double t)
 	}
 	return temp;
 }
+
+template class RG_API BeizierCurve<Point3d>;
+template class RG_API BeizierCurve<Point2d>;
