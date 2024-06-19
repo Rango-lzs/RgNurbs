@@ -1,12 +1,20 @@
-#指定cmake的最小版本号
-CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
+set(TARGET_NAME RgNurbs)
 
-#指定项目名称
-PROJECT(RgNurbs LANGUAGES CXX)
+project(${TARGET_NAME} LANGUAGES CXX)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-#将各种文件归类到指定变量
-FILE(GLOB_RECURSE HEADER_FILES "./*.h")
-FILE(GLOB_RECURSE SRC_FILES "./*.cpp")
+add_library(${TARGET_NAME} SHARED "")
+target_compile_definitions(${TARGET_NAME} PRIVATE RG_NURBS_MODULE)
 
-#将所有文件编译成EXE,并设置以WIN32的方式运行
-ADD_EXECUTABLE(${PROJECT_NAME} ${HEADER_FILES} ${SRC_FILES})
+target_include_directories(${TARGET_NAME} PRIVATE ${SOURCE_DIR})
+
+file(GLOB rootfiles *.cpp *.h)
+source_group("" FILES ${rootfiles})
+target_sources(${TARGET_NAME} PRIVATE ${rootfiles})
+SUBDIRLIST(SUBDIRS ${SOURCE_DIR})
+foreach(subdir ${SUBDIRS})
+    file(GLOB subdirFiles ${subdir}/*.cpp ${subdir}/*.h)
+    string(REPLACE "/" "\\" subdir ${subdir})
+    source_group(${subdir} FILES ${subdirFiles})
+    target_sources(${TARGET_NAME} PRIVATE ${subdirFiles})
+endforeach()

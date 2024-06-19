@@ -1,5 +1,10 @@
 #include "point.h"
 
+Point3d::Point3d()
+	:Point3d(0.0,0.0,0.0)
+{
+
+}
 
 Point3d::Point3d(double x, double y, double z)
 	:mx(x), my(y), mz(z)
@@ -43,7 +48,11 @@ Point3d operator /(const Point3d& pt, double d)
 	return pt * (1 / d);
 }
 
+Point2d::Point2d()
+	:Point2d(0.0, 0.0)
+{
 
+}
 
 Point2d::Point2d(double x, double y)
 	:mx(x), my(y)
