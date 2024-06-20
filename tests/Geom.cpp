@@ -3,8 +3,29 @@
 
 #include <iostream>
 #include "beizier_curve.h"
+#include "bspline_curve.h"
 
 using Point = Point3d;
+
+int test_BSplineCurve()
+{
+	std::vector<Point> ctrlPts{
+		Point(0,0,0),
+		Point(5,10,0),
+		Point(15,10,0),
+		Point(20,0,0)
+	};
+
+    std::vector<double> knots{ 0,0,0,0,1,1,1,1 };
+
+    BSplineCurve<Point> spline(3, knots, ctrlPts);
+    double t = 0.3;
+    Point eval = spline.EvalPointByBasis(t);
+
+    std::cout << "Point on BSpline curve at t = " << t << ": (" << eval.x() << ", " << eval.y() << ")\n";
+
+    return 0;
+}
 
 int test_BezierGPT() {
     // Define control points for a cubic Bezier curve
@@ -42,6 +63,8 @@ int main()
     BeizierCurve<Point> curve(3, ctrlPts);
 
     Point eval = curve.EvalPoint(0.3);
+    std::cout << "Point on Bezier curve at t = " << 0.3 << ": (" << eval.x() << ", " << eval.y() << ")\n";
+
     Point eval1 = curve.EvalPointDirect(0.3);
     Point  eval2 = curve.EvalPointByDeCasteljau(0.3);
     Point firstDeri = curve.EvalDerivation(1, 0.3);
@@ -59,7 +82,8 @@ int main()
     curve.DegreeElevation(elevate);
 
     BeizierCurve<Point> curve_h(4, elevate);
-    Point evalh = curve_h.EvalPoint(0.3);
+    Point evalh = curve_h.EvalPoint(0.3);   
+
     Point eval1h = curve_h.EvalPointDirect(0.3);
     Point  eval2h = curve_h.EvalPointByDeCasteljau(0.3);
     Point firstDerih = curve_h.EvalDerivation(1, 0.3);
@@ -86,6 +110,9 @@ int main()
     std::cout << "Second derivative of Bezier curve at t = " << t << ": (" << secondDerivative.x() << ", " << secondDerivative.y() << ")\n";
 
     test_BezierGPT();
+
+    test_BSplineCurve();
+
     std::cout << "Hello World!\n";
 }
 
