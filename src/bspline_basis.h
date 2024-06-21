@@ -177,6 +177,26 @@ public:
 		}
 		return derivatives;
 	}
+
+	// 查找节点重复度，用于节点插入算法 ，最大节点重复度为 p+1
+	static int FindMultiplicity(double u, const std::vector<double>& knotvector) {
+		return std::count(knotvector.begin(), knotvector.end(), u);
+	}
+
+	// 查找区间
+	static int FindSpanLinear(int degree, const std::vector<double>& knotvector, int num_ctrlpts, double u) {
+		for (int i = degree; i < num_ctrlpts; ++i) {
+			if (u >= knotvector[i] && u < knotvector[i + 1]) {
+				return i;
+			}
+		}
+		return num_ctrlpts - 1;
+	}
+
+	// 计算节点插入alpha值的函
+	static double knot_insertion_alpha(double u, const std::vector<double>& knotvector, int k, int i, int L) {
+		return  (u - knotvector[L + i]) / (knotvector[i + k + 1] - knotvector[L + i]);
+	}
 };
 
 #endif

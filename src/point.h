@@ -15,6 +15,7 @@ public:
     double z() const;
 
     Point3d operator +(const Point3d& pt) const;
+    Point3d operator -(const Point3d& pt) const;
 private:
     double mx, my, mz;
 };
@@ -22,7 +23,7 @@ private:
 RG_API Point3d operator *(const Point3d& pt, double d);
 RG_API Point3d operator *(double d, const Point3d& pt);
 RG_API Point3d operator /(const Point3d& pt, double d);
-RG_API std::iostream& operator << (std::iostream& out, const Point3d& pt);
+RG_API std::ostream& operator << (std::ostream& out, const Point3d& pt);
 
 
 class RG_API Point2d
@@ -35,6 +36,7 @@ public:
     double y() const;
 
     Point2d operator +(const Point2d& pt) const;
+    Point2d operator -(const Point2d& pt) const;
 private:
     double mx, my;
 };

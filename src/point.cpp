@@ -32,6 +32,11 @@ Point3d Point3d::operator +(const Point3d& pt) const
 	return Point3d(mx + pt.mx, my + pt.my, mz + pt.mz);
 }
 
+Point3d Point3d::operator -(const Point3d& pt) const
+{
+	return  *this + (-1.0)*pt;
+}
+
 
 Point3d operator *(const Point3d& pt, double d)
 {
@@ -48,7 +53,7 @@ Point3d operator /(const Point3d& pt, double d)
 	return pt * (1 / d);
 }
 
-std::iostream& operator << (std::iostream out, const Point3d& pt)
+std::ostream& operator << (std::ostream& out, const Point3d& pt)
 {
 	out << pt.x() << pt.y() << pt.z() << std::endl;
 	return out;
@@ -81,6 +86,10 @@ Point2d Point2d::operator +(const Point2d& pt) const
 	return Point2d(mx + pt.mx, my + pt.my);
 }
 
+Point2d Point2d::operator -(const Point2d& pt) const
+{
+	return Point2d(mx - pt.mx, my - pt.my);
+}
 
 Point2d operator *(const Point2d& pt, double d)
 {

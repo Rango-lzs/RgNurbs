@@ -25,7 +25,7 @@ int test_BSplineCurve()
 
     std::vector<Point> deri = spline.CalDerivative(3, t);
 
-    std::cout << deri;
+    std::cout << deri[0];
 
     std::cout << "Point on BSpline curve at t = " << t << ": (" << eval.x() << ", " << eval.y() << ")\n";
     std::cout << "Point on BSpline curve by deBoor at t = " << t << ": (" << eval.x() << ", " << eval.y() << ")\n";
@@ -53,6 +53,38 @@ int test_BezierGPT() {
     std::cout << "Point on Bezier curve at t = " << t << ": (" << point.x() << ", " << point.y() << ")\n";
     std::cout << "First derivative of Bezier curve at t = " << t << ": (" << firstDerivative.x() << ", " << firstDerivative.y() << ")\n";
     std::cout << "Second derivative of Bezier curve at t = " << t << ": (" << secondDerivative.x() << ", " << secondDerivative.y() << ")\n";
+
+    return 0;
+}
+
+// 控制点类型
+using ControlPoint = Point3d;
+using ControlPoints = std::vector<ControlPoint>;
+
+
+int test_insert_and_remove() {
+    // 示例用法
+    int degree = 2;
+    std::vector<double> knotvector = { 0.0, 0.0, 0.0, 1.0,3.0, 3.0, 4.0, 4.0, 4.0 };
+    ControlPoints ctrlpts = { {0.0, 0.0, 0}, {1.0, 2.0, 0}, {2.0, 3.0, 0}, {4.0, 4.0, 0}, {5.0, 2.0, 0} ,{6.0,1.0, 0} };
+    double u = 2.5;
+
+    double t = 0.3;
+    BSplineCurve<Point> curv(degree, knotvector, ctrlpts);
+    Point a = curv.EvalPointByBasis(t);
+
+    ControlPoints result = curv.KnotInsertion(u);
+    std::vector<double> knotvector_new = { 0.0, 0.0, 0.0, 1.0, 2.5, 3.0, 3.0, 4.0, 4.0, 4.0 };
+    BSplineCurve<Point> curv_new(degree, knotvector_new, result);
+    Point b = curv_new.EvalPointByBasis(t);
+    // 输出结果
+    for (const auto& pt : result) {
+        std::cout << pt << " ";
+        std::cout << std::endl;
+    }
+
+    BSplineCurve<Point> curv_remove = curv.KnotRemoval(3.0, 1);
+    Point c = curv_remove.EvalPointByBasis(t);
 
     return 0;
 }
@@ -119,6 +151,8 @@ int main()
 
     test_BSplineCurve();
 
+    test_insert_and_remove();
+
     std::cout << "Hello World!\n";
 }
 
@@ -132,109 +166,3 @@ int main()
 //   4. 使用错误列表窗口查看错误
 //   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
 //   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
-
-
-#include <vector>
-#include <iostream>
-#include <algorithm>
-
-// 用于深度拷贝的工具函数
-template <typename T>
-T deep_copy(const T& obj) {
-    return obj;
-}
-
-// 控制点类型
-using ControlPoint = Point3d;
-using ControlPoints = std::vector<ControlPoint>;
-
-// 查找重数函数 (伪代码实现，请根据实际情况调整)
-int find_multiplicity(double u, const std::vector<double>& knotvector) {
-    return std::count(knotvector.begin(), knotvector.end(), u);
-}
-
-// 查找跨度函数 (伪代码实现，请根据实际情况调整)
-int find_span_linear(int degree, const std::vector<double>& knotvector, int num_ctrlpts, double u) {
-    for (int i = degree; i < num_ctrlpts; ++i) {
-        if (u >= knotvector[i] && u < knotvector[i + 1]) {
-            return i;
-        }
-    }
-    return num_ctrlpts - 1;
-}
-
-// 计算alpha值的函数 (伪代码实现，请根据实际情况调整)
-double knot_insertion_alpha(double u, const std::vector<double>& knotvector, int degree, int k, int i, int L) {
-    return (u - knotvector[k - degree + 1 + i]) / (knotvector[L + 1 + i] - knotvector[k - degree + 1 + i]);
-}
-
-// 节点插入算法
-ControlPoints knot_insertion(int degree, const std::vector<double>& knotvector, const ControlPoints& ctrlpts, double u, int num = 1, int s = -1, int k = -1) {
-    // 若未提供s和k参数，则计算它们
-    if (s == -1) {
-        s = find_multiplicity(u, knotvector);
-    }
-    if (k == -1) {
-        k = find_span_linear(degree, knotvector, ctrlpts.size(), u);
-    }
-
-    // 初始化变量
-    int np = ctrlpts.size();
-    int nq = np + num;
-    ControlPoints ctrlpts_new(nq);
-
-    // 初始化一个长度为degree + 1的局部数组
-    ControlPoints temp(degree + 1);
-
-    // 保存未更改的控制点
-    for (int i = 0; i < k - degree + 1; ++i) {
-        ctrlpts_new[i] = ctrlpts[i];
-    }
-    for (int i = k - s; i < np; ++i) {
-        ctrlpts_new[i + num] = ctrlpts[i];
-    }
-
-    // 开始填充将用于在节点插入期间更新控制点的临时局部数组
-    for (int i = 0; i <= degree - s; ++i) {
-        temp[i] = deep_copy(ctrlpts[k - degree + i]);
-    }
-
-    // 插入节点 "num" 次
-    for (int j = 1; j <= num; ++j) {
-        int L = k - degree + j;
-        for (int i = 0; i <= degree - j - s; ++i) {
-            double alpha = knot_insertion_alpha(u, knotvector,degree, k, i, L);
-            temp[i] = alpha * temp[i + 1] + (1.0 - alpha) * temp[i];
-            
-        }
-        ctrlpts_new[L] = deep_copy(temp[0]);
-        ctrlpts_new[k + num - j - s] = deep_copy(temp[degree - j - s]);
-    }
-
-    // 加载剩余的控制点
-    int L = k - degree + num;
-    for (int i = L + 1; i < k - s; ++i) {
-        ctrlpts_new[i] = deep_copy(temp[i - L]);
-    }
-
-    // 返回插入节点后的控制点
-    return ctrlpts_new;
-}
-
-int insert() {
-    // 示例用法
-    int degree = 3;
-    std::vector<double> knotvector = { 0.0, 0.0, 0.0, 1.0, 2.0, 3.0, 4.0, 4.0, 4.0 };
-    ControlPoints ctrlpts = { {0.0, 0.0, 0}, {1.0, 2.0, 0}, {2.0, 3.0, 0}, {4.0, 4.0, 0}, {5.0, 2.0, 0} };
-    double u = 2.5;
-
-    ControlPoints result = knot_insertion(degree, knotvector, ctrlpts, u);
-
-    // 输出结果
-    for (const auto& pt : result) {
-        std::cout << pt.x() << " ";
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
