@@ -16,6 +16,8 @@
 template<class Point>
 class BSplineCurve
 {
+	using PointArray = std::vector<Point>;
+
 public:
 	BSplineCurve(int degree, const std::vector<double>& knots, const std::vector<Point>& ctrlPts)
 		:m_degree(degree)
@@ -83,7 +85,7 @@ public:
 	}
 
 	//求一阶，二阶导数
-	std::vector<Point> CalDerivative(int order, double u)
+	PointArray CalDerivative(int order, double u)
 	{
 		std::vector<Point> ptRet(order +1);
 		int span = BSplineBasis::FindSpan(m_knots, m_degree, u);
@@ -104,10 +106,61 @@ public:
 		return ptRet;
 	}
 
+	// 节点插入算法
+	PointArray KnotInsertion(double u, int num = 1) {
+
+		int degree = m_degree;
+		int s = BSplineBasis::FindMultiplicity(u, m_knots);
+		int k = BSplineBasis::FindSpan(m_knots, degree, u);
+
+		// 初始化变量
+		int np = m_ctrl_pts.size();
+		int nq = np + num;
+		PointArray ctrlpts_new(nq);
+
+		// 初始化一个长度为degree + 1的局部数组
+		PointArray temp(degree + 1);
+
+		// 保存未更改的控制点
+		for (int i = 0; i < k - degree + 1; ++i) {
+			ctrlpts_new[i] = m_ctrl_pts[i];
+		}
+		for (int i = k - s; i < np; ++i) {
+			ctrlpts_new[i + num] = m_ctrl_pts[i];
+		}
+
+		// 开始填充将用于在节点插入期间更新控制点的临时局部数组
+		for (int i = 0; i <= degree - s; ++i) {
+			temp[i] = m_ctrl_pts[k - degree + i];
+		}
+
+		// 插入节点 "num" 次
+		for (int j = 1; j <= num; ++j) {
+			int L = k - degree + j;
+			for (int i = 0; i <= degree - j - s; ++i) {
+				double alpha = BSplineBasis::knot_insertion_alpha(u, m_knots, k, i, L);
+				//double alpha = (u - m_knots[L + i]) / (m_knots[i + k + 1] - m_knots[L + i]);
+				temp[i] = alpha * temp[i + 1] + (1.0 - alpha) * temp[i];
+
+			}
+			ctrlpts_new[L] = temp[0];
+			ctrlpts_new[k + num - j - s] = temp[degree - j - s];
+		}
+
+		// 加载剩余的控制点
+		int L = k - degree + num;
+		for (int i = L + 1; i < k - s; ++i) {
+			ctrlpts_new[i] = temp[i - L];
+		}
+
+		// 返回插入节点后的控制点
+		return ctrlpts_new;
+	}
+
 private:
 	int m_degree;
 	std::vector<double> m_knots;	//size m
-	std::vector<Point> m_ctrl_pts;  //size n    m = n + m_degree +1;
+	PointArray m_ctrl_pts;  //size n    m = n + m_degree +1;
 };
 
 #endif
