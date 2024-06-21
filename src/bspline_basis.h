@@ -73,6 +73,7 @@ public:
 		return basisFunctions;
 	}
 
+	//计算0到order阶的, 非零基函数导数
 	static std::vector<std::vector<double>> BasisFunctionsDerivatives(int span, int degree, int order, const std::vector<double>& knots, double u)
 	{
 		/*VALIDATE_ARGUMENT(span >= 0, "spanIndex", "SpanIndex must greater than or equals zero.");

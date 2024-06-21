@@ -48,6 +48,12 @@ Point3d operator /(const Point3d& pt, double d)
 	return pt * (1 / d);
 }
 
+std::iostream& operator << (std::iostream out, const Point3d& pt)
+{
+	out << pt.x() << pt.y() << pt.z() << std::endl;
+	return out;
+}
+
 Point2d::Point2d()
 	:Point2d(0.0, 0.0)
 {
