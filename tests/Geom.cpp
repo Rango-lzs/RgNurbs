@@ -21,7 +21,7 @@ int test_BSplineCurve()
     BSplineCurve<Point> spline(3, knots, ctrlPts);
     double t = 0.3;
     Point eval = spline.EvalPointByBasis(t);
-    eval = spline.deBoor(t);
+    eval = spline.EvalPointByDeBoor(t);
 
     std::vector<Point> deri = spline.CalDerivative(3, t);
 
@@ -89,6 +89,24 @@ int test_insert_and_remove() {
     return 0;
 }
 
+int test_non_removable()
+{
+	int degree = 2;
+	std::vector<double> knotvector = { 0.0, 0.0, 0.0, 1.0, 3.0, 4.0, 4.0, 4.0 };
+	ControlPoints ctrlpts = { {0.0, 0.0, 0}, {1.0, 2.0, 0}, {2.0, 3.0, 0}, {4.0, 4.0, 0}, {5.0, 2.0, 0}};
+    BSplineCurve<Point> curv(degree, knotvector, ctrlpts);
+	BSplineCurve<Point> curv_remove = curv.KnotRemoval(3.0, 1);
+	Point c = curv_remove.EvalPointByBasis(0.3);
+
+    std::vector<BSplineCurve<Point>> bseg;
+    curv.Decompose(bseg);
+
+    BSplineCurve<Point> curv_h = curv.degreeElevate(1);
+    Point d = curv_h.EvalPointByBasis(0.3);
+
+    return 1;
+}
+
 int main()
 {
     std::vector<Point> ctrlPts{
@@ -152,6 +170,8 @@ int main()
     test_BSplineCurve();
 
     test_insert_and_remove();
+
+    test_non_removable();
 
     std::cout << "Hello World!\n";
 }
