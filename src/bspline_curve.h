@@ -58,6 +58,10 @@ public:
 	void Decompose(std::vector<BSplineCurve<Point>>& bezierSegs) const;
 
 	BSplineCurve<Point> BSplineCurve<Point>::degreeElevate(int t);
+
+	bool BezDegreeReduce(BSplineCurve<Point>& result);
+
+	BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce();
 	
 private:
 	struct DataRep;

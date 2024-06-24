@@ -107,6 +107,27 @@ int test_non_removable()
     return 1;
 }
 
+int test_bezier_reduce()
+{
+	std::vector<Point> ctrlPts{
+		Point(0,0,0),
+		Point(5,10,0),
+		Point(15,10,0),
+		Point(20,0,0)
+	};
+   
+	BeizierCurve<Point> curve(3, ctrlPts);
+	std::vector<Point> elevate;
+	curve.DegreeElevation(elevate);
+
+    std::vector<double> knots{ 0,0,0,0,0,1,1,1,1,1};
+	BSplineCurve<Point> curve_ele(4, knots, elevate);
+
+    BSplineCurve<Point> curve_reduce;
+    curve_ele.BezDegreeReduce(curve_reduce);
+    return 1;
+}
+
 int main()
 {
     std::vector<Point> ctrlPts{
@@ -172,6 +193,8 @@ int main()
     test_insert_and_remove();
 
     test_non_removable();
+
+    test_bezier_reduce();
 
     std::cout << "Hello World!\n";
 }

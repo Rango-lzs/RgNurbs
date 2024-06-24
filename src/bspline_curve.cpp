@@ -610,5 +610,165 @@ BSplineCurve<Point> BSplineCurve<Point>::degreeElevate(int t) {
 	//resize(mh - ph, ph); // Resize to the proper number of control points
 }
 
+template<class Point>
+bool BSplineCurve<Point>::BezDegreeReduce(BSplineCurve<Point>& result)
+{
+	int degree = Degree;
+	const std::vector<double>& knots = Knots;
+	PointArray& ctrlPts = CtrlPts;
+
+	double tol = 0.01;
+
+	/*int size = controlPoints.size();
+	bool isBezier = ValidationUtils::IsValidBezier(degree, size);
+	if (!isBezier) return false;*/
+
+	int r = floor((degree - 1) / 2);
+	PointArray ctrlPts_new(degree);
+	ctrlPts_new[0] = ctrlPts[0];
+	ctrlPts_new[degree - 1] = ctrlPts[degree];
+
+	std::vector<double> alpha(degree);
+	for (int i = 0; i < degree; i++)
+	{
+		alpha[i] = double(i) / double(degree);
+	}
+	double error = 0.0;
+	if (degree % 2 == 0)
+	{
+		for (int i = 1; i < r + 1; i++)
+		{
+			ctrlPts_new[i] = (ctrlPts[i] - alpha[i] * ctrlPts_new[i - 1]) / (1 - alpha[i]);
+		}
+		for (int i = degree - 2; i > r; i--)
+		{
+			ctrlPts_new[i] = (ctrlPts[i + 1] - (1 - alpha[i + 1]) * ctrlPts_new[i + 1]) / alpha[i + 1];
+		}
+		error = (ctrlPts[r + 1].DistanceTo(0.5 * (ctrlPts_new[r] + ctrlPts_new[r + 1])));
+		double c = Bin(degree, r + 1);
+		error = error * (c * pow(0.5, r + 1) * pow(1 - 0.5, degree - r - 1));
+	}
+	else
+	{
+		for (int i = 1; i < r; i++)
+		{
+			ctrlPts_new[i] = (ctrlPts[i] - alpha[i] * ctrlPts_new[i - 1]) / (1 - alpha[i]);
+		}
+		for (int i = degree - 2; i > r; i--)
+		{
+			ctrlPts_new[i] = (ctrlPts[i + 1] - (1 - alpha[i + 1]) * ctrlPts_new[i + 1]) / alpha[i + 1];
+		}
+		Point PLr = (ctrlPts[r] - alpha[r] * ctrlPts_new[r - 1]) / (1 - alpha[r]);
+		Point PRr = (ctrlPts[r + 1] - (1 - alpha[r + 1]) * ctrlPts_new[r + 1]) / alpha[r + 1];
+		ctrlPts_new[r] = 0.5 * (PLr + PRr);
+		error = PLr.DistanceTo(PRr);
+		double maxU = (degree - std::sqrt(degree)) / (2 * degree);
+		error = error * 0.5 * (1 - alpha[r]) * (Bin(degree, r) * pow(maxU, r) * pow(1 - maxU, r + 1) * (1 - 2 * maxU));
+	}
+	if (error > tol) return false;
+
+	//auto map = KnotVectorUtils::GetKnotMultiplicityMap(knotVector);
+	std::vector<double> knots_new(2*degree);
+	for (int i = 0; i < degree;i++)
+	{
+		knots_new[i] = knots.front();
+		knots_new[2 * degree - i - 1] = knots.back();
+	}
+	
+	result.Degree = degree - 1;
+	result.Knots = knots_new;
+	result.CtrlPts = ctrlPts_new;
+	return true;
+}
+
+
+template<class Point>
+BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
+{
+	int p = Degree;
+	int m = Knots.size() - 1;
+	PointArray bpts(p + 1);
+	PointArray Nextbpts(p - 1);
+	PointArray rbpts(p);
+	std::vector<double> alphas(p - 1);
+	std::vector<double> e(m);
+
+	int ph = p - 1;
+	int mh = ph;
+	int kind = ph + 1;
+	int r = -1;
+	int a = p;
+	int b = p + 1;
+	int cind = 1;
+	int mult = p;
+
+	PointArray ctrlPts_new(CtrlPts.size());
+	std::vector<double> knots_new(mh + 1);
+	ctrlPts_new[0] = CtrlPts[0];
+	for (int i = 0; i <= ph; i++)
+	{
+		knots_new[i] = Knots[0]; // left p+1 knots
+	}
+	
+	for (int i = 0; i < m; i++)
+	{
+		e[i] = 0.0;
+	}
+
+	//loop over the knots
+	while (b < m)
+	{
+		int i = b;
+		while (b < m && Knots[b] == Knots[b + 1]) {
+			b = b + 1;
+		}
+		mult = b - i + 1;
+		mh = mh + mult - 1;
+		int oldr = r;
+		r = p - mult;
+
+		int lbz = 0;
+		if (oldr > 0) {
+			lbz = (oldr + 2) / 2;
+		}
+		else
+		{
+			lbz = 1;
+		}
+
+		//插入节点，提取beizier
+		if (r > 0)
+		{
+			double numer = Knots[b] - Knots[a];
+			for (int k = p; k >= mult; k--)
+			{
+				alphas[k - mult - 1] = numer / (Knots[a + k] - Knots[a]);
+			}
+
+			for (int j = 1; j <= r; j++)
+			{
+				int save = r - j;
+				s = mult + j;
+				for (int k = p; k >= s; k--)
+				{
+					bpts[k] = alphas[k - s] * bpts[k] + (1 - alphas[k - s]) * bpts[k - 1];
+				}
+				Nextbpts[save] = bpts[0];
+			}
+		}
+
+		//Beizier 降解
+		BezDegreeReduce(bpts, rbpts, MaxErr);
+		e[a] = e[a] + MaxErr;
+		if (e[a] > Tol)
+			return false;
+
+		//消去节点U[a] oldr次
+
+	}
+
+}
+
+
 template class RG_API BSplineCurve<Point3d>;
 template class RG_API BSplineCurve<Point2d>;
