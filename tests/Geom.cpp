@@ -124,7 +124,7 @@ int test_bezier_reduce()
 	BSplineCurve<Point> curve_ele(4, knots, elevate);
 
     BSplineCurve<Point> curve_reduce;
-    curve_ele.BezDegreeReduce(curve_reduce);
+    curve_ele.DegreeReduce();
     return 1;
 }
 

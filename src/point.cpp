@@ -27,7 +27,7 @@ double Point3d::z() const
 	return mz;
 }
 
-double Point3d::DistanceTo(const Point3d& p)
+double Point3d::DistanceTo(const Point3d& p) const
 {
 	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my) + (mz - p.mz) * (mz - p.mz));
 }
@@ -92,7 +92,7 @@ double Point2d::y() const
 	return my;
 }
 
-double Point2d::DistanceTo(const Point2d& p)
+double Point2d::DistanceTo(const Point2d& p) const
 {
 	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my));
 }

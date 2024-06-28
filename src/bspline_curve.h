@@ -61,7 +61,11 @@ public:
 
 	bool BezDegreeReduce(BSplineCurve<Point>& result);
 
-	BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce();
+	bool BezDegreeReduce(const PointArray& ctrlPts, PointArray& ctrlPts_reduce);
+
+	BSplineCurve<Point> DegreeReduce();
+
+	//Curve Composite Algorithm
 	
 private:
 	struct DataRep;

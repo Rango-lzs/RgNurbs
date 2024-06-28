@@ -683,8 +683,66 @@ bool BSplineCurve<Point>::BezDegreeReduce(BSplineCurve<Point>& result)
 
 
 template<class Point>
+bool BSplineCurve<Point>::BezDegreeReduce(const PointArray& ctrlPts, PointArray& ctrlPts_new)
+{
+	int degree = ctrlPts.size() - 1;
+	double tol = 0.01;
+
+	/*int size = controlPoints.size();
+	bool isBezier = ValidationUtils::IsValidBezier(degree, size);
+	if (!isBezier) return false;*/
+
+	int r = floor((degree - 1) / 2);
+	ctrlPts_new.resize(degree);
+	ctrlPts_new[0] = ctrlPts[0];
+	ctrlPts_new[degree - 1] = ctrlPts[degree];
+
+	std::vector<double> alpha(degree);
+	for (int i = 0; i < degree; i++)
+	{
+		alpha[i] = double(i) / double(degree);
+	}
+	double error = 0.0;
+	if (degree % 2 == 0)
+	{
+		for (int i = 1; i < r + 1; i++)
+		{
+			ctrlPts_new[i] = (ctrlPts[i] - alpha[i] * ctrlPts_new[i - 1]) / (1 - alpha[i]);
+		}
+		for (int i = degree - 2; i > r; i--)
+		{
+			ctrlPts_new[i] = (ctrlPts[i + 1] - (1 - alpha[i + 1]) * ctrlPts_new[i + 1]) / alpha[i + 1];
+		}
+		error = ctrlPts[r + 1].DistanceTo(0.5 * (ctrlPts_new[r] + ctrlPts_new[r + 1]));
+		double c = Bin(degree, r + 1);
+		error = error * (c * pow(0.5, r + 1) * pow(1 - 0.5, degree - r - 1));
+	}
+	else
+	{
+		for (int i = 1; i < r; i++)
+		{
+			ctrlPts_new[i] = (ctrlPts[i] - alpha[i] * ctrlPts_new[i - 1]) / (1 - alpha[i]);
+		}
+		for (int i = degree - 2; i > r; i--)
+		{
+			ctrlPts_new[i] = (ctrlPts[i + 1] - (1 - alpha[i + 1]) * ctrlPts_new[i + 1]) / alpha[i + 1];
+		}
+		Point PLr = (ctrlPts[r] - alpha[r] * ctrlPts_new[r - 1]) / (1 - alpha[r]);
+		Point PRr = (ctrlPts[r + 1] - (1 - alpha[r + 1]) * ctrlPts_new[r + 1]) / alpha[r + 1];
+		ctrlPts_new[r] = 0.5 * (PLr + PRr);
+		error = PLr.DistanceTo(PRr);
+		double maxU = (degree - std::sqrt(degree)) / (2 * degree);
+		error = error * 0.5 * (1 - alpha[r]) * (Bin(degree, r) * pow(maxU, r) * pow(1 - maxU, r + 1) * (1 - 2 * maxU));
+	}
+	if (error > tol) return false;
+
+	return true;
+}
+
+template<class Point>
 BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
 {
+	double tol = 0.1;
 	int p = Degree;
 	int m = Knots.size() - 1;
 	PointArray bpts(p + 1);
@@ -703,11 +761,16 @@ BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
 	int mult = p;
 
 	PointArray ctrlPts_new(CtrlPts.size());
-	std::vector<double> knots_new(mh + 1);
+	std::vector<double> knots_new(m);
 	ctrlPts_new[0] = CtrlPts[0];
 	for (int i = 0; i <= ph; i++)
 	{
 		knots_new[i] = Knots[0]; // left p+1 knots
+	}
+
+	for (int i = 0; i <= p; i++)
+	{
+		bpts[i] = CtrlPts[i];
 	}
 	
 	for (int i = 0; i < m; i++)
@@ -748,7 +811,7 @@ BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
 			for (int j = 1; j <= r; j++)
 			{
 				int save = r - j;
-				s = mult + j;
+				int s = mult + j;
 				for (int k = p; k >= s; k--)
 				{
 					bpts[k] = alphas[k - s] * bpts[k] + (1 - alphas[k - s]) * bpts[k - 1];
@@ -758,15 +821,88 @@ BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
 		}
 
 		//Beizier 降解
-		BezDegreeReduce(bpts, rbpts, MaxErr);
-		e[a] = e[a] + MaxErr;
+		BezDegreeReduce(bpts, rbpts);
+		/*e[a] = e[a] + MaxErr;
 		if (e[a] > Tol)
-			return false;
+			return false;*/
 
 		//消去节点U[a] oldr次
+		if (oldr > 0)
+		{
+			int first = kind;
+			int last = kind;
+			for (int k = 0; k < oldr; k++)
+			{
+				int i = first; int j = last;
+				int kj = j - kind;
 
+				while (j - i > k)
+				{
+					double alfa = (Knots[a] - knots_new[i - 1]) / (Knots[b] - knots_new[i - 1]);
+					double beta = (Knots[a] - knots_new[j - k - 1]) / (Knots[b] - knots_new[j - k - 1]);
+					ctrlPts_new[i - 1] = (ctrlPts_new[i - 1] - (1.0 - alfa) * ctrlPts_new[i - 2]) / alfa;
+					rbpts[kj] = (rbpts[kj] - beta * rbpts[kj + 1]) / (1.0 - beta);
+					i = i + 1; j = j - 1; kj = kj - 1;
+				}
+				//计算节点去除的误差界Br
+				double Br = 0.0;
+				if (j - i < k)
+				{
+					Br = CtrlPts[i - 2].DistanceTo(rbpts[kj + 1]);
+				}
+				else
+				{
+					double delta = (Knots[a] - knots_new[i - 1]) / (Knots[b] - knots_new[i - 1]);
+					Point A = delta* rbpts[kj + 1] + (1.0 - delta) * ctrlPts_new[i - 2];
+					Br = ctrlPts_new[i - 1].DistanceTo(A);
+				}
+				
+				int K = a  + oldr - k;
+				int q = (2 * p - k + 1) / 2;
+				int L = K - q;
+
+				for (int ii = L; ii <= a; ii++)
+				{
+					e[ii] = e[ii] + Br;
+					if (e[ii] > tol)
+						throw;
+				}
+				first = first - 1;
+				last = last + 1;			
+			}
+			cind = i - 1;
+		}
+
+		//载入节点向量和控制点
+		if (a != p)
+		{
+			for (int i = 0; i < ph - oldr; i++)
+			{
+				knots_new[kind] = Knots[a]; kind = kind + 1;
+			}
+		}
+		for (i = lbz; i <= ph; i++)
+		{
+			ctrlPts_new[cind] = rbpts[i];
+			cind = cind + 1;
+		}
+			
+		if (b < m)
+		{
+			for (i = 0; i< r; i++)
+				bpts[i] = Nextbpts[i];
+			for (i = r; i<= p; i++)
+				bpts[i] = CtrlPts[b - p + i];
+			a = b;
+			b = b + 1;
+		}	
+		else
+			for (i = 0; i<= ph; i++)
+				knots_new[kind + i] = Knots[b];
 	}
 
+	int nh = mh - ph - 1;
+	return BSplineCurve<Point>();
 }
 
 
