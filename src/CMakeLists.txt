@@ -9,6 +9,7 @@ target_compile_definitions(${TARGET_NAME} PRIVATE RG_NURBS_MODULE)
 target_include_directories(${TARGET_NAME} PRIVATE ${SOURCE_DIR})
 
 file(GLOB rootfiles *.cpp *.h)
+
 source_group("" FILES ${rootfiles})
 target_sources(${TARGET_NAME} PRIVATE ${rootfiles})
 SUBDIRLIST(SUBDIRS ${SOURCE_DIR})

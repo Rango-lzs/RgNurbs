@@ -61,6 +61,15 @@ BSplineCurve<Point>::BSplineCurve(const BSplineCurve& other)
 	m_dataRep = std::make_unique<DataRep>(other.Degree, other.Knots, other.CtrlPts);
 }
 
+
+template<class Point>
+BSplineCurve<Point>& BSplineCurve<Point>::operator=(const BSplineCurve& other)
+{
+	m_dataRep.release();
+	m_dataRep = std::make_unique<DataRep>(other.Degree, other.Knots, other.CtrlPts);
+	return *this;
+}
+
 template<class Point>
 Point BSplineCurve<Point>::EvalPointByBasis(double t)
 {
@@ -903,6 +912,107 @@ BSplineCurve<Point> BSplineCurve<Point>::DegreeReduce()
 
 	int nh = mh - ph - 1;
 	return BSplineCurve<Point>();
+}
+
+template<class Point>
+void BSplineCurve<Point>::ReparamLinear(double low, double high, BSplineCurve<Point>& result)
+{
+	std::vector<double> knot_new = Knots;
+	double knot_low = knot_new.front();
+	double knot_higu = knot_new.back();
+	for (int i = 0; i < knot_new.size(); i++)
+	{
+		knot_new[i] = low + (Knots[i] - Knots[0]) / (Knots.back() - Knots.front()) * (high - low);
+	}
+
+	result = BSplineCurve<Point>(Degree, knot_new, CtrlPts);
+}
+
+
+template<class Point>
+void BSplineCurve<Point>::TessellateEqualKnot(std::vector<Point>& tessPts, std::vector<double>& tessUs, int sampNums)
+{
+	double knots_range = Knots.back() - Knots.front();
+	double strip = knots_range / sampNums;
+	tessPts.push_back(CtrlPts.front());
+	tessUs.push_back(Knots.front());
+
+	for (int i = 1; i < sampNums; i++)
+	{
+		double cur_u = Knots.front() + i * strip;
+		tessPts.push_back(EvalPointByDeBoor(cur_u));
+		tessUs.push_back(cur_u);
+	}
+	tessPts.push_back(CtrlPts.back());
+	tessUs.push_back(Knots.back());
+}
+
+
+template<class Point>
+double BSplineCurve<Point>::ParamOfPoint(const Point& tgtPt)
+{
+	//初步确认参数区间
+	std::vector<Point> tessPts;
+	std::vector<double> tessUs;
+	TessellateEqualKnot(tessPts, tessUs, 10);
+	double minDis = 10000000;
+	double init_u = 0;
+
+	for (int i = 0; i < tessPts.size(); i++)
+	{
+		double dis = tessPts[i].DistanceTo(tgtPt);
+		if ( dis < minDis)
+		{
+			minDis = dis;
+			init_u = tessUs[i];
+		}
+	}
+
+	//牛顿迭代细化
+	double low = Knots.front();
+	double high = Knots.back();
+
+	int maxIterations = 10;
+	double cur_u = init_u;
+	double tol = 1.0e-6;
+	while (maxIterations--)
+	{
+		std::vector<Point> deri = CalDerivative(2, cur_u);
+		Point vec = deri[0] - tgtPt;
+		double f = deri[1].DotProduct(vec);
+
+		double condition1 = vec.Length();
+		double condition2 = std::abs(f / (deri[1].Length() * condition1));
+
+		if (condition1 < tol &&
+			condition2 < tol)
+		{
+			return cur_u;
+		}
+
+		double df = deri[2].DotProduct(vec) + deri[1].DotProduct(deri[1]);
+		double temp = cur_u - f / df;
+
+
+		if (temp < low)
+		{
+			temp = low;
+		}
+		if (temp > high)
+		{
+			temp = high;
+		}
+
+
+		double condition4 = ((temp - cur_u) * deri[1]).Length();
+		if (condition4 < tol)
+		{
+			return cur_u;
+		}
+
+		cur_u = temp;
+	}
+	return cur_u;
 }
 
 

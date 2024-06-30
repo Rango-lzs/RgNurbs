@@ -19,9 +19,11 @@ int test_BSplineCurve()
     std::vector<double> knots{ 0,0,0,0,1,1,1,1 };
 
     BSplineCurve<Point> spline(3, knots, ctrlPts);
-    double t = 0.3;
+    double t = 0.65;
     Point eval = spline.EvalPointByBasis(t);
     eval = spline.EvalPointByDeBoor(t);
+
+    double up = spline.ParamOfPoint(eval);
 
     std::vector<Point> deri = spline.CalDerivative(3, t);
 
@@ -128,6 +130,25 @@ int test_bezier_reduce()
     return 1;
 }
 
+int test_shit_knots()
+{
+	int degree = 2;
+	std::vector<double> knotvector = { 0.0, 0.0, 0.0, 1.0, 3.0, 4.0, 4.0, 4.0 };
+	ControlPoints ctrlpts = { {0.0, 0.0, 0}, {1.0, 2.0, 0}, {2.0, 3.0, 0}, {4.0, 4.0, 0}, {5.0, 2.0, 0} };
+	BSplineCurve<Point> curv(degree, knotvector, ctrlpts);
+    
+    std::vector<Point> curve_tess;
+    std::vector<double> us;
+    curv.TessellateEqualKnot(curve_tess, us, 10);
+
+    BSplineCurve<Point> curv_shift;
+    curv.ReparamLinear(1.0, 6.0, curv_shift);
+	std::vector<Point> curve_tess_shift;
+    curv_shift.TessellateEqualKnot(curve_tess_shift, us, 10);
+    return 1;
+
+}
+
 int main()
 {
     std::vector<Point> ctrlPts{
@@ -195,6 +216,8 @@ int main()
     test_non_removable();
 
     test_bezier_reduce();
+
+    test_shit_knots();
 
     std::cout << "Hello World!\n";
 }

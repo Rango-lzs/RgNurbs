@@ -15,6 +15,8 @@ public:
     double z() const;
 
     double DistanceTo(const Point3d& other) const;
+    double DotProduct(const Point3d& other) const;
+    double Length() const;
 
     Point3d operator +(const Point3d& pt) const;
     Point3d& operator +=(const Point3d& pt);
@@ -38,7 +40,9 @@ public:
     double x() const;
     double y() const;
 
-    double DistanceTo(const Point2d& other) const ;
+    double DistanceTo(const Point2d& other) const;
+    double DotProduct(const Point2d& other) const;
+    double Length() const;
 
     Point2d operator +(const Point2d& pt) const;
     Point2d& operator +=(const Point2d& pt);

@@ -4,8 +4,10 @@
 #include "bspline_basis.h"
 #include <vector>
 #include <memory>
+#include "point.h"
 
 //BSpline curve was define by the degree, knots and control points
+//right now, we only focus on the clamped style BSpline 
 /*
 * 1. 参数点求值(直接法 和 DeBoor法)
 * 2. 导数计算，支持一阶和二阶
@@ -13,6 +15,14 @@
 * 4. 升阶，降阶
 * 5. Subdivide
 */
+
+class RG_API DataRep_
+{
+public:
+	int m_degree;
+	std::vector<double> m_knots;	//size m
+	std::vector<Point3d> m_ctrl_pts;  //size n    m = n + Degree +1;
+};
 
 template<class Point>
 class BSplineCurve
@@ -24,6 +34,8 @@ public:
 	BSplineCurve(int degree, const std::vector<double>& knots, const std::vector<Point>& ctrlPts);
 	~BSplineCurve();
 	BSplineCurve(const BSplineCurve& other);
+	BSplineCurve& operator = (const BSplineCurve& other);
+
 
 	//通过基函数计算点, 对于t:[ui,ui+1),仅N(k,p) k = i, i-1, i-2, ... i-p 
 	//共p+1个基函数为非零的
@@ -63,13 +75,23 @@ public:
 
 	bool BezDegreeReduce(const PointArray& ctrlPts, PointArray& ctrlPts_reduce);
 
+	//降解算法的实现，还有待研究研究
 	BSplineCurve<Point> DegreeReduce();
 
+	//两条或者多条BSpline曲线如何拼接
 	//Curve Composite Algorithm
+
+	//Ch-6.4 重新参数化
+	void ReparamLinear(double low, double high, BSplineCurve<Point>& result);
+
+	void TessellateEqualKnot(std::vector<Point>& tessPts, std::vector<double>& tessUs, int sampNums);
+
+	double ParamOfPoint(const Point& pt);
 	
 private:
 	struct DataRep;
 	std::unique_ptr<DataRep> m_dataRep;
 };
+
 
 #endif

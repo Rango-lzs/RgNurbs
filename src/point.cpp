@@ -32,6 +32,16 @@ double Point3d::DistanceTo(const Point3d& p) const
 	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my) + (mz - p.mz) * (mz - p.mz));
 }
 
+double Point3d::DotProduct(const Point3d& p) const
+{
+	return mx * p.mx + my * p.my + mz * p.mz;
+}
+
+double Point3d::Length() const
+{
+	return std::sqrt(mx * mx + my * my + mz*mz);
+}
+
 Point3d Point3d::operator +(const Point3d& pt) const
 {
 	return Point3d(mx + pt.mx, my + pt.my, mz + pt.mz);
@@ -95,6 +105,16 @@ double Point2d::y() const
 double Point2d::DistanceTo(const Point2d& p) const
 {
 	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my));
+}
+
+double Point2d::DotProduct(const Point2d& p) const
+{
+	return mx * p.mx + my * p.my;
+}
+
+double Point2d::Length() const
+{
+	return std::sqrt(mx*mx+my*my);
 }
 
 Point2d Point2d::operator +(const Point2d& pt) const
