@@ -19,15 +19,17 @@ public:
     double Length() const;
 
     Point3d operator +(const Point3d& pt) const;
-    Point3d& operator +=(const Point3d& pt);
     Point3d operator -(const Point3d& pt) const;
+    Point3d operator *(double d) const;
+    Point3d operator /(double d) const;
+    Point3d& operator +=(const Point3d& pt);
+    Point3d& operator -=(const Point3d& pt);
+    
 private:
     double mx, my, mz;
 };
 
-RG_API Point3d operator *(const Point3d& pt, double d);
 RG_API Point3d operator *(double d, const Point3d& pt);
-RG_API Point3d operator /(const Point3d& pt, double d);
 RG_API std::ostream& operator << (std::ostream& out, const Point3d& pt);
 
 
@@ -45,14 +47,16 @@ public:
     double Length() const;
 
     Point2d operator +(const Point2d& pt) const;
-    Point2d& operator +=(const Point2d& pt);
     Point2d operator -(const Point2d& pt) const;
+    Point2d operator *(double d) const;
+    Point2d operator /(double d) const;
+    Point2d& operator +=(const Point2d& pt);
+    Point2d& operator -=(const Point2d& pt);
 private:
     double mx, my;
 };
 
-RG_API Point2d operator *(const Point2d& pt, double d);
 RG_API Point2d operator *(double d, const Point2d& pt);
-RG_API Point2d operator /(const Point2d& pt, double d);
+RG_API std::ostream& operator << (std::ostream& out, const Point2d& pt);
 
 #endif

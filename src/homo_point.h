@@ -17,20 +17,24 @@ public:
     double y() const;
     double z() const;
 
+    double wx() const;
+    double wy() const;
+    double wz() const;
+    double wi() const;
+
     double DistanceTo(const HPoint3d& other) const;
-    double DotProduct(const HPoint3d& other) const;
-    double Length() const;
 
     HPoint3d operator +(const HPoint3d& pt) const;
-    HPoint3d& operator +=(const HPoint3d& pt);
     HPoint3d operator -(const HPoint3d& pt) const;
     HPoint3d operator *(double d) const;
+    HPoint3d operator /(double d) const;
+    HPoint3d& operator +=(const HPoint3d& pt);
+    HPoint3d& operator -=(const HPoint3d& pt);
 private:
     double mx, my, mz, mw;
 };
 
 RG_API HPoint3d operator *(double d, const HPoint3d& pt);
-RG_API HPoint3d operator /(const HPoint3d& pt, double d);
 RG_API std::ostream& operator << (std::ostream& out, const HPoint3d& pt);
 
 
@@ -45,19 +49,23 @@ public:
     double x() const;
     double y() const;
 
+    double wx() const;
+    double wy() const;
+    double wi() const;
+
     double DistanceTo(const HPoint2d& other) const;
-    double DotProduct(const HPoint2d& other) const;
-    double Length() const;
 
     HPoint2d operator +(const HPoint2d& pt) const;
-    HPoint2d& operator +=(const HPoint2d& pt);
     HPoint2d operator -(const HPoint2d& pt) const;
+    HPoint2d operator *(double d) const;
+    HPoint2d operator /(double d) const;
+    HPoint2d& operator +=(const HPoint2d& pt);
+    HPoint2d& operator -=(const HPoint2d& pt);
 private:
     double mx, my, mw;
 };
 
-RG_API HPoint2d operator *(const HPoint2d& pt, double d);
 RG_API HPoint2d operator *(double d, const HPoint2d& pt);
-RG_API HPoint2d operator /(const HPoint2d& pt, double d);
+RG_API std::ostream& operator << (std::ostream& out, const HPoint2d& pt);
 
 #endif

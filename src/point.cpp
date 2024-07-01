@@ -47,31 +47,36 @@ Point3d Point3d::operator +(const Point3d& pt) const
 	return Point3d(mx + pt.mx, my + pt.my, mz + pt.mz);
 }
 
+Point3d Point3d::operator -(const Point3d& pt) const
+{
+	return  *this + (-1.0) * pt;
+}
+
 Point3d& Point3d::operator +=(const Point3d& pt)
 {
 	*this = *this + pt;
 	return *this;
 }
 
-Point3d Point3d::operator -(const Point3d& pt) const
+Point3d& Point3d::operator -=(const Point3d& pt)
 {
-	return  *this + (-1.0)*pt;
+	*this = *this - pt;
+	return *this;
 }
 
-
-Point3d operator *(const Point3d& pt, double d)
+Point3d Point3d::operator *(double d) const
 {
-	return Point3d{ pt.x() * d, pt.y() * d, pt.z() * d };
+	return Point3d{ mx * d, my * d, mz * d };
+}
+
+Point3d Point3d::operator /(double d) const
+{
+	return *this * (1 / d);
 }
 
 Point3d operator *(double d, const Point3d& pt)
 {
 	return  pt * d;
-}
-
-Point3d operator /(const Point3d& pt, double d)
-{
-	return pt * (1 / d);
 }
 
 std::ostream& operator << (std::ostream& out, const Point3d& pt)
@@ -122,6 +127,11 @@ Point2d Point2d::operator +(const Point2d& pt) const
 	return Point2d(mx + pt.mx, my + pt.my);
 }
 
+Point2d Point2d::operator -(const Point2d& pt) const
+{
+	return Point2d(mx - pt.mx, my - pt.my);
+}
+
 Point2d& Point2d::operator +=(const Point2d& pt)
 {
 	*this = *this + pt;
@@ -130,20 +140,27 @@ Point2d& Point2d::operator +=(const Point2d& pt)
 
 Point2d Point2d::operator -(const Point2d& pt) const
 {
-	return Point2d(mx - pt.mx, my - pt.my);
+	return  *this + (-1.0) * pt;
 }
 
-Point2d operator *(const Point2d& pt, double d)
+Point2d& Point2d::operator -=(const Point2d& pt)
 {
-	return Point2d{ pt.x() * d, pt.y() * d};
+	*this = *this - pt;
+	return *this;
 }
 
-Point2d operator *(double d, const Point2d& pt)
+Point2d Point2d::operator *(double d) const
 {
-	return  pt * d;
+	return Point2d{ mx * d, my * d};
 }
 
-Point2d operator /(const Point2d& pt, double d)
+Point2d Point2d::operator /(double d) const
 {
-	return pt * (1 / d);
+	return *this * (1 / d);
+}
+
+std::ostream& operator << (std::ostream& out, const Point2d& pt)
+{
+	out << pt.x() << pt.y() << std::endl;
+	return out;
 }
