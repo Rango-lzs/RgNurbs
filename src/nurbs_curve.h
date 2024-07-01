@@ -3,22 +3,23 @@
 
 #include <vector>
 
-template<class Point>
+template<class HPoint>
 class NurbsCurve
 {
-	using PointArray = std::vector<Point>;
+	using HPointArray = std::vector<HPoint>;
+	using PointArray = std::vector<HPoint::Point>;
 
 public:
 	NurbsCurve();
 	NurbsCurve(int degree, const std::vector<double>& knots, 
-		const std::vector<Point>& ctrlPts, std::vector<double>& weights);
+		const std::vector<HPoint>& ctrlPts, std::vector<double>& weights);
 	~NurbsCurve();
 	NurbsCurve(const NurbsCurve& other);
 	NurbsCurve& operator = (const NurbsCurve& other);
 
-	Point EvalPointByBasis(double t);
+	HPoint::Point EvalPoint(double t);
 
-	Point EvalPointByDeBoor(double u);
+	HPoint::Point EvalHPointByDeBoor(double u);
 
 	//求一阶，二阶导数
 	PointArray CalDerivative(int order, double u);
@@ -27,25 +28,25 @@ public:
 	PointArray KnotInsertion(double u, int num = 1);
 
 	// 移除节点，保持曲线形状不变，注意，不一定能成功移除
-	NurbsCurve<Point> KnotRemoval(double u, int times);
+	NurbsCurve<HPoint> KnotRemoval(double u, int times);
 
-	NurbsCurve<Point> KnotRefine(std::vector<double>& us);
+	NurbsCurve<HPoint> KnotRefine(std::vector<double>& us);
 
-	void Decompose(std::vector<NurbsCurve<Point>>& bezierSegs) const;
+	void Decompose(std::vector<NurbsCurve<HPoint>>& bezierSegs) const;
 
-	NurbsCurve<Point> NurbsCurve<Point>::degreeElevate(int t);
+	NurbsCurve<HPoint> NurbsCurve<HPoint>::degreeElevate(int t);
 
-	bool BezDegreeReduce(NurbsCurve<Point>& result);
+	bool BezDegreeReduce(NurbsCurve<HPoint>& result);
 
-	bool BezDegreeReduce(const PointArray& ctrlPts, PointArray& ctrlPts_reduce);
+	bool BezDegreeReduce(const HPointArray& ctrlPts, HPointArray& ctrlPts_reduce);
 
-	NurbsCurve<Point> DegreeReduce();
+	NurbsCurve<HPoint> DegreeReduce();
 
-	void ReparamLinear(double low, double high, NurbsCurve<Point>& result);
+	void ReparamLinear(double low, double high, NurbsCurve<HPoint>& result);
 
-	void TessellateEqualKnot(std::vector<Point>& tessPts, std::vector<double>& tessUs, int sampNums);
+	void TessellateEqualKnot(std::vector<HPoint>& tessPts, std::vector<double>& tessUs, int sampNums);
 
-	double ParamOfPoint(const Point& pt);
+	double ParamOfHPoint(const HPoint& pt);
 
 private:
 	struct DataRep;

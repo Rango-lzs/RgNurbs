@@ -9,6 +9,7 @@
 //BSpline curve was define by the degree, knots and control points
 //right now, we only focus on the clamped style BSpline 
 /*
+* 此类只提供一些基础算法，具体应用算法在Nurbs曲线中
 * 1. 参数点求值(直接法 和 DeBoor法)
 * 2. 导数计算，支持一阶和二阶
 * 3. 节点插入
@@ -16,6 +17,7 @@
 * 5. Subdivide
 */
 
+/*The dummy structure  for debug visualization*/
 class RG_API DataRep_
 {
 public:
@@ -92,6 +94,5 @@ private:
 	struct DataRep;
 	std::unique_ptr<DataRep> m_dataRep;
 };
-
 
 #endif

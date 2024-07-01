@@ -66,12 +66,10 @@ NurbsCurve<Point>& NurbsCurve<Point>::operator=(const NurbsCurve& other)
 	return *this;
 }
 
-template<class Point>
-Point NurbsCurve<Point>::EvalPoint(double t)
+template<class HPoint>
+HPoint::Point NurbsCurve<HPoint>::EvalPoint(double t)
 {
-	Point pt;
-	
-	
-
-	return pt;
+	BSplineCurve<HPoint> bspline(degree, knots, ctrlPts);
+	HPoint pt = bspline.EvalPointByBasis(t);
+	return pt.ToPoint();
 }
