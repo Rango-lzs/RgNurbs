@@ -6,9 +6,10 @@
 template<class HPoint>
 class NurbsCurve
 {
+	using Point = typename HPoint::Point;
 	using HPointArray = std::vector<HPoint>;
-	using PointArray = std::vector<HPoint::Point>;
-
+	using PointArray = std::vector<Point>;
+	
 public:
 	NurbsCurve();
 	NurbsCurve(int degree, const std::vector<double>& knots, 
@@ -17,9 +18,9 @@ public:
 	NurbsCurve(const NurbsCurve& other);
 	NurbsCurve& operator = (const NurbsCurve& other);
 
-	HPoint::Point EvalPoint(double t);
+	Point EvalPoint(double t);
 
-	HPoint::Point EvalHPointByDeBoor(double u);
+	Point EvalHPointByDeBoor(double u);
 
 	//求一阶，二阶导数
 	PointArray CalDerivative(int order, double u);
@@ -44,9 +45,9 @@ public:
 
 	void ReparamLinear(double low, double high, NurbsCurve<HPoint>& result);
 
-	void TessellateEqualKnot(std::vector<HPoint>& tessPts, std::vector<double>& tessUs, int sampNums);
+	void TessellateEqualKnot(std::vector<Point>& tessPts, std::vector<double>& tessUs, int sampNums);
 
-	double ParamOfHPoint(const HPoint& pt);
+	double ParamOfPoint(const Point& pt);
 
 private:
 	struct DataRep;

@@ -28,6 +28,7 @@ endmacro(SUBDIRLIST)
 
 option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
 
+
 add_subdirectory(src)
 if(ENABLE_UNIT_TESTS)
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Tests)

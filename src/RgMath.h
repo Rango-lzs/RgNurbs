@@ -5,17 +5,17 @@
 
 #include <math.h>
 
-#define ZW_ZERO          1.0e-12                          /* System zero */
-#define ZW_ISZERO(x)      (-ZW_ZERO < (x) && (x) < ZW_ZERO)
-#define ZW_DEG_TO_RAD    0.01745329251994329577           /* (1.0/180.0) * pi */
-#define ZW_INFINITY      1.0e+20                          /* Computer infinity */
-#define ZW_PI            3.141592653589793238463          /* pi (180 deg in radians) */
-#define ZW_2PI           6.283185307179586476925          /* 2.0 * pi */
-#define ZW_PI_INV        0.318309886183790671538          /* 1.0 / pi */
-#define ZW_PI_DIV_2      1.570796326794896619231          /* pi / 2.0 */
-#define ZW_PI_DIV_4      0.785398163339744830962          /* pi / 4.0 */
-#define ZW_PI_DIV_6      0.523598775598298873077          /* pi / 6.0 */
-#define ZW_SQRT2         1.414213562373095048801          /* sqrt(2) */
+#define RG_ZERO          1.0e-12                          /* System zero */
+#define RG_ISZERO(x)      (-RG_ZERO < (x) && (x) < RG_ZERO)
+#define RG_DEG_TO_RAD    0.01745329251994329577           /* (1.0/180.0) * pi */
+#define RG_INFINITY      1.0e+20                          /* Computer infinity */
+#define RG_PI            3.141592653589793238463          /* pi (180 deg in radians) */
+#define RG_2PI           6.283185307179586476925          /* 2.0 * pi */
+#define RG_PI_INV        0.318309886183790671538          /* 1.0 / pi */
+#define RG_PI_DIV_2      1.570796326794896619231          /* pi / 2.0 */
+#define RG_PI_DIV_4      0.785398163339744830962          /* pi / 4.0 */
+#define RG_PI_DIV_6      0.523598775598298873077          /* pi / 6.0 */
+#define RG_SQRT2         1.414213562373095048801          /* sqrt(2) */
 
 namespace RgMath
 {
@@ -59,21 +59,21 @@ namespace RgMath
     template<typename T>
     void Lim2Init(Lim2<T> &lim)
     {
-        lim.x.min = (T)ZW_INFINITY;
-        lim.x.max = -(T)ZW_INFINITY;
-        lim.y.min = (T)ZW_INFINITY;
-        lim.y.max = -(T)ZW_INFINITY;
+        lim.x.min = (T)RG_INFINITY;
+        lim.x.max = -(T)RG_INFINITY;
+        lim.y.min = (T)RG_INFINITY;
+        lim.y.max = -(T)RG_INFINITY;
     }
 
     template<typename T>
     void Lim3Init(Lim3<T> &lim)
     {
-        lim.x.min = (T)ZW_INFINITY;
-        lim.x.max = -(T)ZW_INFINITY;
-        lim.y.min = (T)ZW_INFINITY;
-        lim.y.max = -(T)ZW_INFINITY;
-        lim.z.min = (T)ZW_INFINITY;
-        lim.z.max = -(T)ZW_INFINITY;
+        lim.x.min = (T)RG_INFINITY;
+        lim.x.max = -(T)RG_INFINITY;
+        lim.y.min = (T)RG_INFINITY;
+        lim.y.max = -(T)RG_INFINITY;
+        lim.z.min = (T)RG_INFINITY;
+        lim.z.max = -(T)RG_INFINITY;
     }
 
     template<typename T>
@@ -122,7 +122,7 @@ namespace RgMath
             return sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y));
         }
 
-        bool IsSameTol(const Point2<T> &p, T tol = (T)ZW_ZERO) const
+        bool IsSameTol(const Point2<T> &p, T tol = (T)RG_ZERO) const
         {
             if (fabs(x - p.x) > tol)
                 return false;
@@ -232,7 +232,7 @@ namespace RgMath
         bool Normalize()
         {
             // refer to "diV3Normalize"
-            constexpr T V_GEOM_ZERO = (T)ZW_ZERO;
+            constexpr T V_GEOM_ZERO = (T)RG_ZERO;
             T length = Length();
             if (length < V_GEOM_ZERO)
             {
@@ -619,7 +619,7 @@ namespace RgMath
         bool Normalize()
         {
             T dirLen = sqrt(a * a + b * b);
-            if (dirLen < (T)ZW_ZERO)
+            if (dirLen < (T)RG_ZERO)
             {
                 return false;
             }
@@ -642,7 +642,7 @@ namespace RgMath
                 return fabs(a * pt.x + b * pt.y + c) / sqrt(a * a + b * b);
         }
 
-        bool IsPointOnLine(const Point2<T>& pt, bool isNormalizedLine = false, T tol = (T)ZW_ZERO) const
+        bool IsPointOnLine(const Point2<T>& pt, bool isNormalizedLine = false, T tol = (T)RG_ZERO) const
         {
             return DistanceToPoint(pt, isNormalizedLine) <= tol;
         }
@@ -654,7 +654,7 @@ namespace RgMath
             return std::signbit(dis_1) == std::signbit(dis_2);
         }
 
-        Point2<T> ProjectionOfPnt(const Point2<T>& pt, bool isNormalizedLine = false, T tol = (T)ZW_ZERO) const
+        Point2<T> ProjectionOfPnt(const Point2<T>& pt, bool isNormalizedLine = false, T tol = (T)RG_ZERO) const
         {
             if (IsPointOnLine(pt, isNormalizedLine, tol))
                 return pt;
@@ -714,7 +714,7 @@ namespace RgMath
             }
         }
 
-        bool IsPointOnSegment(const Point2<T>& pt, T tol = (T)ZW_ZERO) const
+        bool IsPointOnSegment(const Point2<T>& pt, T tol = (T)RG_ZERO) const
         {
             if (equ.DistanceToPoint(pt, true) > tol)
                 return false;
@@ -794,15 +794,15 @@ namespace RgMath
         Point3<T> PointOnPlane() const
         {
             Point3<T> pt(0, 0, 0);
-            if (!ZW_ISZERO(a))
+            if (!RG_ISZERO(a))
             {
                 pt.x = -d / a;
             }
-            else if (!ZW_ISZERO(b))
+            else if (!RG_ISZERO(b))
             {
                 pt.y = -d / b;
             }
-            else if (!ZW_ISZERO(c))
+            else if (!RG_ISZERO(c))
             {
                 pt.z = -d / c;
             }
@@ -812,7 +812,7 @@ namespace RgMath
         bool Normalize()
         {
             T dirLen = Direction().Length();
-            if (dirLen < (T)ZW_ZERO)
+            if (dirLen < (T)RG_ZERO)
             {
                 return false;
             }
@@ -830,7 +830,7 @@ namespace RgMath
             c *= -1;
         }
 
-        bool IsSameTo(Plane<T> p, T tol = (T)ZW_ZERO) const
+        bool IsSameTo(Plane<T> p, T tol = (T)RG_ZERO) const
         {
             Plane<T> p0(a, b, c, d);
             p0.Normalize();
@@ -845,12 +845,12 @@ namespace RgMath
             return false;
         }
 
-        bool IsIntersectWith(Plane<T> p, T tol = (T)ZW_ZERO) const
+        bool IsIntersectWith(Plane<T> p, T tol = (T)RG_ZERO) const
         {
             return !IsParallelTo(p, tol);
         }
 
-        bool IsParallelTo(Plane<T> p, T tol = (T)ZW_ZERO) const
+        bool IsParallelTo(Plane<T> p, T tol = (T)RG_ZERO) const
         {
             Plane<T> p0(a, b, c, d);
             p0.Normalize();
@@ -887,12 +887,12 @@ namespace RgMath
                 return (a * pt.x + b * pt.y + c * pt.z + d) / sqrt(a * a + b * b + c * c);
         }
 
-        bool IsPointOnPlane(const Point3<T>& pt, T tol = (T)ZW_ZERO, bool isNormalizedPlane = false) const
+        bool IsPointOnPlane(const Point3<T>& pt, T tol = (T)RG_ZERO, bool isNormalizedPlane = false) const
         {
             return DistanceToPoint(pt, isNormalizedPlane) <= tol;
         }
 
-        bool IsIntersectWith(const Lim3<T>& lim3, T tol = (T)ZW_ZERO) const
+        bool IsIntersectWith(const Lim3<T>& lim3, T tol = (T)RG_ZERO) const
         {
             Plane<T> p(a, b, c, d);
             p.Normalize();
