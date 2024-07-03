@@ -47,6 +47,11 @@ double HPoint3d::wi() const
 	return mw;
 }
 
+HPoint3d::Point HPoint3d::ToPoint() const
+{
+	return HPoint3d::Point(mx, my , mz);
+}
+
 double HPoint3d::DistanceTo(const HPoint3d& p) const
 {
 	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my) +

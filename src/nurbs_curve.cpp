@@ -73,3 +73,9 @@ typename HPoint::Point NurbsCurve<HPoint>::EvalPoint(double t)
 	HPoint pt = bspline.EvalPointByBasis(t);
 	return pt.ToPoint();
 }
+
+template<class HPoint>
+HPoint::Point NurbsCurve<HPoint>::EvalHPointByDeBoor(double u)
+{
+
+}
