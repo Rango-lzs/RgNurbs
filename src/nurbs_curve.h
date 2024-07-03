@@ -2,6 +2,7 @@
 #define NURBS_CURVE_H
 
 #include <vector>
+#include <memory>
 
 template<class HPoint>
 class NurbsCurve
@@ -9,10 +10,10 @@ class NurbsCurve
 	using Point = typename HPoint::Point;
 	using HPointArray = std::vector<HPoint>;
 	using PointArray = std::vector<Point>;
-	
+
 public:
 	NurbsCurve();
-	NurbsCurve(int degree, const std::vector<double>& knots, 
+	NurbsCurve(int degree, const std::vector<double>& knots,
 		const std::vector<HPoint>& ctrlPts, std::vector<double>& weights);
 	~NurbsCurve();
 	NurbsCurve(const NurbsCurve& other);

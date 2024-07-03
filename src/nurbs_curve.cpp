@@ -13,8 +13,8 @@
 	ctrlPts = CtrlPts;\
 	weights = Weights;
 
-template<class Point>
-struct NurbsCurve<Point>::DataRep
+template<class HPoint>
+struct NurbsCurve<HPoint>::DataRep
 {
 public:
 	DataRep(int degree, const std::vector<double>& knots, const std::vector<Point>& ctrlPts, std::vector<double>& weights)
@@ -27,19 +27,19 @@ public:
 	}
 	int m_degree;
 	std::vector<double> m_knots;	//size m
-	PointArray m_ctrl_pts;  //size n    m = n + Degree +1;
+	HPointArray m_ctrl_pts;  //size n    m = n + Degree +1;
 	std::vector<double> m_weights;
 };
 
-template<class Point>
-NurbsCurve<Point>::NurbsCurve()
-	:m_dataRep(std::make_unique<DataRep>(0, std::vector<double>(), PointArray(), std::vector<double>()))
+template<class HPoint>
+NurbsCurve<HPoint>::NurbsCurve()
+	:m_dataRep(std::make_unique<DataRep>(0, std::vector<double>(), HPointArray(), std::vector<double>()))
 {
 
 }
 
-template<class Point>
-NurbsCurve<Point>::NurbsCurve(int degree, const std::vector<double>& knots, const std::vector<Point>& ctrlPts, std::vector<double>& weights)
+template<class HPoint>
+NurbsCurve<HPoint>::NurbsCurve(int degree, const std::vector<double>& knots, const std::vector<HPoint>& ctrlPts, std::vector<double>& weights)
 	:m_dataRep(std::make_unique<DataRep>(degree, knots, ctrlPts, weights))
 {
 
@@ -67,7 +67,7 @@ NurbsCurve<Point>& NurbsCurve<Point>::operator=(const NurbsCurve& other)
 }
 
 template<class HPoint>
-HPoint::Point NurbsCurve<HPoint>::EvalPoint(double t)
+typename HPoint::Point NurbsCurve<HPoint>::EvalPoint(double t)
 {
 	BSplineCurve<HPoint> bspline(degree, knots, ctrlPts);
 	HPoint pt = bspline.EvalPointByBasis(t);

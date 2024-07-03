@@ -1,7 +1,10 @@
 #include "beizier_curve.h"
 #include "nurbs_export.h"
-#include <assert.h>
+#include "rg_assert.h"
 
+#define Degree m_dataRep->m_degree
+#define CtrlPts m_dataRep->m_ctrlPts
+#define Knots m_dataRep->m_knots
 
 namespace
 {
@@ -56,21 +59,27 @@ public:
 
 template<class Point>
 BeizierCurve<Point>::BeizierCurve(int degree, std::vector<Point> ctrlPts)
-	:m_degree(degree)
-	,m_ctrlPts(ctrlPts)
+	:m_dataRep(std::make_unique<DataRep>(degree, ctrlPts))
 {
-	assert(degree == ctrlPts.size() - 1);
+	RgAssert(degree == ctrlPts.size() - 1,"Invalid Parameter");
 }
+
+template<class Point>
+BeizierCurve<Point>::~BeizierCurve()
+{
+
+}
+
 
 //
 template<class Point>
 Point BeizierCurve<Point>::EvalPoint(double param)
 {
-	std::vector<double> B = calBernstein(m_degree, param);
+	std::vector<double> B = calBernstein(Degree, param);
 	Point temp;
-	for (int k = 0; k <= m_degree; k++)
+	for (int k = 0; k <= Degree; k++)
 	{
-		temp = temp + B[k] * m_ctrlPts[k];
+		temp = temp + B[k] * CtrlPts[k];
 	}
 	return temp;
 }
@@ -79,10 +88,10 @@ template<class Point>
 Point BeizierCurve<Point>::EvalPointDirect(double t)
 {
 	Point temp;
-	int n = m_degree;
-	for (int k = 0; k <= m_degree; k++)
+	int n = Degree;
+	for (int k = 0; k <= Degree; k++)
 	{
-		temp = temp + comb(n, k) * pow(t,k) * (pow((1 - t) ,(n - k))) * m_ctrlPts[k];
+		temp = temp + comb(n, k) * pow(t,k) * (pow((1 - t) ,(n - k))) * CtrlPts[k];
 	}
 	return temp;
 }
@@ -91,10 +100,10 @@ Point BeizierCurve<Point>::EvalPointDirect(double t)
 template<class Point>
 Point BeizierCurve<Point>::EvalPointByDeCasteljau(double param)
 {
-	std::vector<Point> temp = m_ctrlPts;
-	for (int k = 1; k <= m_degree; k++)
+	std::vector<Point> temp = CtrlPts;
+	for (int k = 1; k <= Degree; k++)
 	{
-		for (int i = 0; i <= m_degree - k; i++)
+		for (int i = 0; i <= Degree - k; i++)
 		{
 			temp[i] = (1.0 - param) * temp[i] + param * temp[i + 1];
 		}
@@ -113,7 +122,6 @@ Point BeizierCurve<Point>::deCasteljau(const std::vector<Point>& controlPoints, 
 			points[i] = lerp(points[i], points[i + 1], t);
 		}
 	}
-
 	return points[0];
 }
 
@@ -121,10 +129,10 @@ Point BeizierCurve<Point>::deCasteljau(const std::vector<Point>& controlPoints, 
 template<class Point>
 Point BeizierCurve<Point>::EvalDerivation(int order, double t)
 {
-	int n = m_degree;
+	int n = Degree;
 	std::vector<Point> firstDeriCtrlPts(n);
 	for (int i = 0; i < n; ++i) {
-		Point dp = n * (m_ctrlPts[i + 1] + (-1.0) * m_ctrlPts[i]);
+		Point dp = n * (CtrlPts[i + 1] + (-1.0) * CtrlPts[i]);
 
 		firstDeriCtrlPts[i] = dp;
 	}
@@ -152,23 +160,23 @@ Point BeizierCurve<Point>::EvalDerivation(int order, double t)
 template<class Point>
 bool BeizierCurve<Point>::SubDivision(double param, std::vector<Point>& left, std::vector<Point>& right)
 {
-	left.resize(m_degree + 1, Point());
-	right.resize(m_degree + 1, Point());
+	left.resize(Degree + 1, Point());
+	right.resize(Degree + 1, Point());
 
-	left[0] = m_ctrlPts[0];
-	right[m_degree] = m_ctrlPts[m_degree];
+	left[0] = CtrlPts[0];
+	right[Degree] = CtrlPts[Degree];
 
-	std::vector<Point> temp = m_ctrlPts;
+	std::vector<Point> temp = CtrlPts;
 	//沿着三角形递推，每往前推一步，取首尾点
-	for (int k = 1; k <= m_degree; k++)
+	for (int k = 1; k <= Degree; k++)
 	{
-		for (int i = 0; i <= m_degree - k; i++)
+		for (int i = 0; i <= Degree - k; i++)
 		{
 			temp[i] = (1.0 - param) * temp[i] + param * temp[i + 1];
 		}
 
 		left[k] = temp[0];
-		right[m_degree - k] = temp[m_degree - k];
+		right[Degree - k] = temp[Degree - k];
 	}
 	return true;
 }
@@ -176,13 +184,13 @@ bool BeizierCurve<Point>::SubDivision(double param, std::vector<Point>& left, st
 template<class Point>
 bool BeizierCurve<Point>::SubDivision_1(double param, std::vector<Point>& cv_left, std::vector<Point>& cv_right)
 {
-	cv_left.resize(m_ctrlPts.size());
-	cv_right.resize(m_ctrlPts.size());
+	cv_left.resize(CtrlPts.size());
+	cv_right.resize(CtrlPts.size());
 
-	int p = m_ctrlPts.size() - 1;
+	int p = CtrlPts.size() - 1;
 	//将 cv 拷贝到 cv_right,因为每次迭代计算的点数依次少1，
 	//因此可以直接用cv_right记录，全部算完后就是所有的尾点集合
-	std::copy(m_ctrlPts.begin(), m_ctrlPts.end(), cv_right.begin());
+	std::copy(CtrlPts.begin(), CtrlPts.end(), cv_right.begin());
 	cv_left[0] = cv_right[0];
 
 	//p次迭代
@@ -200,16 +208,16 @@ bool BeizierCurve<Point>::SubDivision_1(double param, std::vector<Point>& cv_lef
 template<class Point>
 bool BeizierCurve<Point>::DegreeElevation(std::vector<Point>& nweCtrlPts)
 {
-	int n = m_degree + 1;
-	nweCtrlPts.resize(m_degree + 2);
+	int n = Degree + 1;
+	nweCtrlPts.resize(Degree + 2);
 
-	nweCtrlPts.front() = m_ctrlPts.front();
-	nweCtrlPts.back() = m_ctrlPts.back();
+	nweCtrlPts.front() = CtrlPts.front();
+	nweCtrlPts.back() = CtrlPts.back();
 
 	for (int i = 1; i < n; ++i)
 	{
 		double ratio = ((double)i) / n;
-		nweCtrlPts[i] = ratio * m_ctrlPts[i - 1] + (1.0 - ratio) * m_ctrlPts[i];
+		nweCtrlPts[i] = ratio * CtrlPts[i - 1] + (1.0 - ratio) * CtrlPts[i];
 	}
 
 	return true;

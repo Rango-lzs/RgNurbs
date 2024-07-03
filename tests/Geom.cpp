@@ -4,6 +4,7 @@
 #include <iostream>
 #include "beizier_curve.h"
 #include "bspline_curve.h"
+#include "bezier_curve_gpt.h"
 
 using Point = Point3d;
 

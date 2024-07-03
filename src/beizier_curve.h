@@ -3,6 +3,7 @@
 
 #include "point.h"
 #include <vector>
+#include <memory>
 
 template<class Point>
 class BeizierCurve
@@ -11,6 +12,8 @@ class BeizierCurve
 public:
 	//beizier curve was total defined by control points
 	BeizierCurve(int degree, std::vector<Point> ctrlPts);
+
+	~BeizierCurve();
     //
 	Point EvalPoint(double param);
 

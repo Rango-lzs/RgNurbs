@@ -138,11 +138,6 @@ Point2d& Point2d::operator +=(const Point2d& pt)
 	return *this;
 }
 
-Point2d Point2d::operator -(const Point2d& pt) const
-{
-	return  *this + (-1.0) * pt;
-}
-
 Point2d& Point2d::operator -=(const Point2d& pt)
 {
 	*this = *this - pt;
@@ -157,6 +152,11 @@ Point2d Point2d::operator *(double d) const
 Point2d Point2d::operator /(double d) const
 {
 	return *this * (1 / d);
+}
+
+Point2d operator *(double d, const Point2d& pt)
+{
+	return  pt * d;
 }
 
 std::ostream& operator << (std::ostream& out, const Point2d& pt)
