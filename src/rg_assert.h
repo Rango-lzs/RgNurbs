@@ -19,7 +19,7 @@ inline void msg_assert(const char* condition,
 }
 
 #ifdef NDEBUG
-#define better_assert(condition, message) static_cast<void>(0)
+#define RgAssert(condition, message) static_cast<void>(0)
 #else
 #define RgAssert(condition, message) \
     static_cast<bool>(condition)          \

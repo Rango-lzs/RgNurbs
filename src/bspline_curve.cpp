@@ -130,7 +130,7 @@ typename BSplineCurve<Point>::PointArray BSplineCurve<Point>::CalDerivative(int 
 }
 
 template<class Point>
-typename BSplineCurve<Point>::PointArray BSplineCurve<Point>::KnotInsertion(double u, int num = 1) {
+typename BSplineCurve<Point>::PointArray BSplineCurve<Point>::KnotInsertion(double u, int num) {
 
 	int degree = Degree;
 	int s = BSplineBasis::FindMultiplicity(u, Knots);

@@ -1,41 +1,15 @@
-set(TARGET_NAME Tests)
-project(${TARGET_NAME})
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/$<CONFIG>)
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-file(GLOB TEST_FILES ${SOURCE_DIR}/*.cpp)
-add_executable(${TARGET_NAME} ${TEST_FILES})
+cmake_minimum_required(VERSION 3.2)
+project(rg_tests)
 
-#include(FetchContent)
-#FetchContent_Declare(
-#	googletest
-#	GIT_REPOSITORY https://github.com/google/googletest.git
-#	GIT_TAG release-1.12.0
-#)
-#FetchContent_GetProperties(googletest)
-#if(NOT googletest_POPULATED)
-#	FetchContent_Populate(googletest)	
-#	set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-#	set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)	
-#	add_subdirectory(
-#		${googletest_SOURCE_DIR}
-#		${googletest_BINARY_DIR}
-#		)
-#		
-#	if(MSVC)
-#		foreach(_tgt gtest gtest_main gmock gmock_main)
-#		target_compile_definitions(${_tgt}
-#			PRIVATE
-#				"_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
-#		)
-#		endforeach()
-#	endif()
-#endif()
-#
-#set_target_properties(
-#    gtest gtest_main gmock gmock_main
-#    PROPERTIES FOLDER "gtest"
-#)
+add_subdirectory(lib/googletest)
 
-target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(${TARGET_NAME} RgNurbs)
-add_dependencies(${TARGET_NAME} RgNurbs)
+include_directories(${RG_HEADERS_DIR})
+include_directories(lib/googletest/googletest/include)
+
+#set(SOURCE_FILES main.cpp src/divider_tests.cpp)
+file(GLOB SRC_FILES *.cpp *.h src/*.cpp src/*.h)
+
+add_executable(rg_tests ${SRC_FILES})
+target_link_libraries(rg_tests RgNurbs gtest)
+install(TARGETS rg_tests DESTINATION ${RG_INSTALL_BIN_DIR})
+

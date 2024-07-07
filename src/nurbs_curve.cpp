@@ -75,7 +75,7 @@ typename HPoint::Point NurbsCurve<HPoint>::EvalPoint(double t)
 }
 
 template<class HPoint>
-HPoint::Point NurbsCurve<HPoint>::EvalHPointByDeBoor(double u)
+typename HPoint::Point NurbsCurve<HPoint>::EvalHPointByDeBoor(double u)
 {
 
 }

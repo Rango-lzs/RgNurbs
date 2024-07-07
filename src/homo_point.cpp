@@ -7,60 +7,60 @@ HPoint3d::HPoint3d()
 }
 
 HPoint3d::HPoint3d(double x, double y, double z, double w)
-	: mx(x), my(y), mz(z), mw(w)
+	: m_wx(w*x), m_wy(w*y), m_wz(w*z), m_w(w)
 {
 
 }
 
 double HPoint3d::x() const
 {
-	return mx;
+	return m_wx/m_w;
 }
 
 double HPoint3d::y() const
 {
-	return my;
+	return m_wy/m_w;
 }
 
 double HPoint3d::z() const
 {
-	return mz;
+	return m_wz/m_w;
 }
 
 double HPoint3d::wx() const
 {
-	return mx * mw;
+	return m_wx;
 }
 
 double HPoint3d::wy() const
 {
-	return my * mw;
+	return m_wy;
 }
 
 double HPoint3d::wz() const
 {
-	return mz * mw;
+	return m_wz;
 }
 
 double HPoint3d::wi() const
 {
-	return mw;
+	return m_w;
 }
 
 HPoint3d::Point HPoint3d::ToPoint() const
 {
-	return HPoint3d::Point(mx, my , mz);
+	return HPoint3d::Point(x(), y(), z());
 }
 
 double HPoint3d::DistanceTo(const HPoint3d& p) const
 {
-	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my) +
-		(mz - p.mz) * (mz - p.mz) + (mw - p.mw) * (mw - p.mw));
+	return sqrt((m_wx - p.m_wx) * (m_wx - p.m_wx) + (m_wy - p.m_wy) * (m_wy - p.m_wy) +
+		(m_wz - p.m_wz) * (m_wz - p.m_wz) + (m_w - p.m_w) * (m_w - p.m_w));
 }
 
 HPoint3d HPoint3d::operator +(const HPoint3d& pt) const
 {
-	return HPoint3d(mx + pt.mx, my + pt.my, mz + pt.mz, mw + pt.mw);
+	return HPoint3d(m_wx + pt.m_wx, m_wy + pt.m_wy, m_wz + pt.m_wz, m_w + pt.m_w);
 }
 
 HPoint3d HPoint3d::operator -(const HPoint3d& pt) const
@@ -82,7 +82,7 @@ HPoint3d& HPoint3d::operator -=(const HPoint3d& pt)
 
 HPoint3d HPoint3d::operator *(double d) const
 {
-	return HPoint3d{ mx * d, my * d, mz * d, mw * d };
+	return HPoint3d{ m_wx * d, m_wy * d, m_wz * d, m_w * d };
 }
 
 HPoint3d HPoint3d::operator /(double d) const
@@ -108,45 +108,45 @@ HPoint2d::HPoint2d()
 }
 
 HPoint2d::HPoint2d(double x, double y, double w)
-	: mx(x), my(y), mw(w)
+	: m_wx(w*x), m_wy(w*y), m_w(w)
 {
 
 }
 
 double HPoint2d::x() const
 {
-	return mx;
+	return m_wx/m_w;
 }
 
 double HPoint2d::y() const
 {
-	return my;
+	return m_wy / m_w;
 }
 
 double HPoint2d::wx() const
 {
-	return mx * mw;
+	return m_wx;
 }
 
 double HPoint2d::wy() const
 {
-	return my * mw;
+	return m_wy;
 }
 
 double HPoint2d::wi() const
 {
-	return mw;
+	return m_w;
 }
 
 double HPoint2d::DistanceTo(const HPoint2d& p) const
 {
-	return sqrt((mx - p.mx) * (mx - p.mx) + (my - p.my) * (my - p.my) +
-		(mw - p.mw) * (mw - p.mw));
+	return sqrt((m_wx - p.m_wx) * (m_wx - p.m_wx) + (m_wy - p.m_wy) * (m_wy - p.m_wy) +
+		(m_w - p.m_w) * (m_w - p.m_w));
 }
 
 HPoint2d HPoint2d::operator +(const HPoint2d& pt) const
 {
-	return HPoint2d(mx + pt.mx, my + pt.my, mw + pt.mw);
+	return HPoint2d(m_wx + pt.m_wx, m_wy + pt.m_wy, m_w + pt.m_w);
 }
 
 HPoint2d HPoint2d::operator -(const HPoint2d& pt) const
@@ -168,7 +168,7 @@ HPoint2d& HPoint2d::operator -=(const HPoint2d& pt)
 
 HPoint2d HPoint2d::operator *(double d) const
 {
-	return HPoint2d{ mx * d, my * d, mw * d };
+	return HPoint2d{ m_wx * d, m_wy * d, m_w * d };
 }
 
 HPoint2d HPoint2d::operator /(double d) const

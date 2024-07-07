@@ -23,6 +23,7 @@ public:
     double wi() const;
 
     double DistanceTo(const HPoint3d& other) const;
+    Point ToPoint() const;
 
     HPoint3d operator +(const HPoint3d& pt) const;
     HPoint3d operator -(const HPoint3d& pt) const;
@@ -31,7 +32,7 @@ public:
     HPoint3d& operator +=(const HPoint3d& pt);
     HPoint3d& operator -=(const HPoint3d& pt);
 private:
-    double mx, my, mz, mw;
+    double m_wx, m_wy, m_wz, m_w;
 };
 
 RG_API HPoint3d operator *(double d, const HPoint3d& pt);
@@ -54,6 +55,7 @@ public:
     double wi() const;
 
     double DistanceTo(const HPoint2d& other) const;
+    Point ToPoint() const;
 
     HPoint2d operator +(const HPoint2d& pt) const;
     HPoint2d operator -(const HPoint2d& pt) const;
@@ -62,7 +64,7 @@ public:
     HPoint2d& operator +=(const HPoint2d& pt);
     HPoint2d& operator -=(const HPoint2d& pt);
 private:
-    double mx, my, mw;
+    double m_wx, m_wy, m_w;
 };
 
 RG_API HPoint2d operator *(double d, const HPoint2d& pt);

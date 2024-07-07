@@ -1,36 +1,41 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.2)
+
 project(RgNurbs)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+set(CMAKE_CXX_STANDARD 17)
+
+if(MSVC)
+    add_compile_options(
+        $<$<CONFIG:Debug>:/MDd> #---|-- Statically link the runtime libraries
+        $<$<CONFIG:Release>:/MD> #--|
+    )
+endif()
+
+message(STATUS "This info is for debug: " ${CMAKE_BINARY_DIR})
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakePredefinedTargets")
 
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/$<CONFIG>)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/$<CONFIG>)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_BINARY_DIR}/$<CONFIG>)
-endforeach()
 
-macro(SUBDIRLIST result curdir)
-    file(GLOB_RECURSE children LIST_DIRECTORIES true RELATIVE ${curdir} ${curdir}/*)
-    set(dirlist "")
-    foreach(child ${children})
-        if(IS_DIRECTORY ${curdir}/${child})
-            list(APPEND dirlist ${child})
-        endif()
-    endforeach()
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
 
-    set(${result} ${dirlist})
-endmacro(SUBDIRLIST)
+set(RG_INSTALL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(RG_INSTALL_BIN_DIR ${PROJECT_SOURCE_DIR}/bin)
+set(RG_INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
-option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
+set(RG_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src)
+
+include_directories(${RG_INSTALL_INCLUDE_DIR})
+include_directories(${RG_HEADERS_DIR})
 
 add_subdirectory(src)
-if(ENABLE_UNIT_TESTS)
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Tests)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
 
+set_target_properties(
+    gtest gtest_main gmock gmock_main
+    PROPERTIES FOLDER "gtest"
+)
