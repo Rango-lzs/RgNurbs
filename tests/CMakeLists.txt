@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 project(rg_tests)
 
-add_subdirectory(lib/googletest)
+add_subdirectory(gtest_repo)
 
 include_directories(${RG_HEADERS_DIR})
-include_directories(lib/googletest/googletest/include)
+include_directories(gtest_repo/googletest/include)
 
 #set(SOURCE_FILES main.cpp src/divider_tests.cpp)
 file(GLOB SRC_FILES *.cpp *.h src/*.cpp src/*.h)

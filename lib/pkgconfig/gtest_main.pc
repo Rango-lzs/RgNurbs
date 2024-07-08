@@ -1,10 +1,10 @@
-libdir=E:/Project/CADProject/RgNurbs/lib
-includedir=E:/Project/CADProject/RgNurbs/include
+libdir=D:/Lzs/PhysicEngine/几何CAD/RgNurbs/lib
+includedir=D:/Lzs/PhysicEngine/几何CAD/RgNurbs/include
 
 Name: gtest_main
 Description: GoogleTest (with main() function)
-Version: 1.11.0
+Version: 1.14.0
 URL: https://github.com/google/googletest
-Requires: gtest = 1.11.0
+Requires: gtest = 1.14.0
 Libs: -L${libdir} -lgtest_main 
 Cflags: -I${includedir} -DGTEST_HAS_PTHREAD=0

@@ -1,10 +1,10 @@
-libdir=E:/Project/CADProject/RgNurbs/lib
-includedir=E:/Project/CADProject/RgNurbs/include
+libdir=D:/Lzs/PhysicEngine/几何CAD/RgNurbs/lib
+includedir=D:/Lzs/PhysicEngine/几何CAD/RgNurbs/include
 
 Name: gmock_main
 Description: GoogleMock (with main() function)
-Version: 1.11.0
+Version: 1.14.0
 URL: https://github.com/google/googletest
-Requires: gmock = 1.11.0
+Requires: gmock = 1.14.0
 Libs: -L${libdir} -lgmock_main 
 Cflags: -I${includedir} -DGTEST_HAS_PTHREAD=0
